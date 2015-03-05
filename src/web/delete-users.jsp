@@ -1,8 +1,7 @@
 <%@ page import="java.net.MalformedURLException,
                  java.util.*,
                  org.dom4j.DocumentException,
-                 org.apache.commons.fileupload.DiskFileUpload,
-                 org.apache.commons.fileupload.FileItem,org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,org.jivesoftware.openfire.XMPPServer,org.jivesoftware.util.ParamUtils"
+                 org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,org.jivesoftware.openfire.XMPPServer,org.jivesoftware.util.ParamUtils"
 %>
 
 <%
@@ -52,14 +51,7 @@
             <td class="jive-icon"><img src="images/error-16x16.gif" width="16" height="16" border="0"></td>
             <td class="jive-icon-label">
             <% if (errors.containsKey("emptyData")) { %>
-               Please input username and password list.<br>
-            <% }else if (errors.containsKey("invalidUser")) { %>
-                
-                <% if (plugin.isUserProviderReadOnly()) { %>
-                   The following users did not exist in the system or have invalid username so their roster was not loaded:<br>
-                <% } else { %>
-                   The following users already exist in the system or have invalid username and were not loaded:<br>
-                <% } %>
+               Please input username list.<br>
             <% } %>
             </td>
         </tr>
