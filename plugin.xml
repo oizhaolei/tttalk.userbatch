@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin>
+   <class>org.tttalk.openfire.plugin.TTTalkUserBatchPlugin</class>
+
+   <name>TTTalk User Create/Delete</name>
+   <description>Create/Delete user accounts</description>
+   <author>tttalk.org</author>
+   <version>1.0.0</version>
+   <date>03/05/2015</date>
+   <minServerVersion>3.9.0</minServerVersion>
+
+   <adminconsole>
+      <tab id="tab-plugins">
+         <sidebar id="tttalk" name="TTTalk">
+            <item id="tttalk-create" name="TTTalk User Create"
+                  url="create-users.jsp"
+                  description="Create Openfire user batchly." />
+         </sidebar>
+         <sidebar id="tttalk" name="TTTalk">
+            <item id="tttalk-delete" name="TTTalk User Delete"
+                  url="delete-users.jsp"
+                  description="Delete Openfire user batchly." />
+         </sidebar>
+      </tab>
+   </adminconsole>
+</plugin>
