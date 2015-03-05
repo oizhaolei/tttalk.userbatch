@@ -36,15 +36,15 @@
     </head>
     <style>
 	    ::-webkit-input-placeholder::before {
-		  content: "username_1 password_1\000Ausername_2 password_2\000Ausername_3 password_3";
+		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
 		}
 		
 		::-moz-placeholder::before {
-		  content: "username_1 password_1\000Ausername_2 password_2\000Ausername_3 password_3";
+		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
 		}
 		
 		:-ms-input-placeholder::before {
-		  content: "username_1 password_1\000Ausername_2 password_2\000Ausername_3 password_3";
+		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
 		}
     </style>
     <body>
