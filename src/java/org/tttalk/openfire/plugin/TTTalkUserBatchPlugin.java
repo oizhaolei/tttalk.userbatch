@@ -38,6 +38,14 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		userManager = null;
 		provider = null;
 	}
+	/**
+	 * Convenience method that returns true if this UserProvider is read-only.
+	 *
+	 * @return true if the user provider is read-only.
+	 */
+	public boolean isUserProviderReadOnly() {
+		return provider.isReadOnly();
+	}
 
 	public List<String> createUsers(String userData) {
 		List<String> invalidUsers = new ArrayList<String>();
@@ -56,7 +64,7 @@ public class TTTalkUserBatchPlugin implements Plugin {
 				try {
 					userName = Stringprep.nodeprep(userName);
 
-					if (!provider.isReadOnly()) {
+					if (!isUserProviderReadOnly()) {
 						userManager.createUser(userName, password, null, null);
 						log.info("createUser: " + userName + "," + password);
 					}
