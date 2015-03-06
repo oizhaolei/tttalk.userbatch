@@ -6,7 +6,7 @@
 %>
 
 <%
-	boolean deleteUsers = request.getParameter("data") != null;
+	boolean deleteUsers = request.getParameter("deleteUsers") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
    
@@ -84,7 +84,7 @@
 
 <% } %>
 
-<form action="delete-users.jsp?deleteUsers" method="post" >
+<form action="delete-users.jsp?deleteUsers=true" method="post" >
 
 <div class="jive-contentBoxHeader">Delete</div>
 <div class="jive-contentBox">

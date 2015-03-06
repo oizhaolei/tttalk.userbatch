@@ -1,12 +1,15 @@
 <%@ page import="java.net.MalformedURLException,
                  java.util.*,
-                 org.dom4j.DocumentException,
                  org.apache.commons.fileupload.DiskFileUpload,
-                 org.apache.commons.fileupload.FileItem,org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,org.jivesoftware.openfire.XMPPServer,org.jivesoftware.util.ParamUtils"
+                 org.apache.commons.fileupload.FileItem,
+                 org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,
+                 org.jivesoftware.openfire.XMPPServer,
+                 org.jivesoftware.util.ParamUtils"
 %>
 
 <%
-	boolean createUsers = request.getParameter("data") != null;
+	boolean createUsers = request.getParameter("createUsers") != null;
+	boolean importUsers = request.getParameter("importUsers") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
     List<String> duplicateUsers = new ArrayList<String>();
@@ -26,7 +29,15 @@
             
             errors.put("invalidUser", "invalidUser");
     	}        
-	} 
+	} else if (importUsers) {
+        DiskFileUpload dfu = new DiskFileUpload();
+      
+        List fileItems = dfu.parseRequest(request);
+        Iterator i = fileItems.iterator();
+        FileItem fi = (FileItem) i.next();
+        plugin.importUserData(fi);
+        response.sendRedirect("create-users.jsp?success=true");
+	}
 %>
 
 <html>
@@ -105,13 +116,25 @@
 
 <% } %>
 
-<form action="create-users.jsp?createUsers" method="post" >
+<form action="create-users.jsp?createUsers=true" method="post" >
 
 <div class="jive-contentBoxHeader">Create</div>
 <div class="jive-contentBox">
     <textarea name="data" rows="10" style="width:50%" placeholder=" "></textarea>
 </div>
 <input type="submit" value="Create">
+
+</form>
+
+
+
+<form action="create-users.jsp?importUsers=true" method="post" enctype="multipart/form-data">
+	<div class="jive-contentBoxHeader">Import</div>
+	<div class="jive-contentBox">
+	    Choose a file to import:</p>
+	    <input type="file" name="thefile">
+	</div>
+	<input type="submit" value="Import">
 
 </form>
 

@@ -2,10 +2,15 @@ package org.tttalk.openfire.plugin;
 
 import gnu.inet.encoding.Stringprep;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.fileupload.FileItem;
+import org.dom4j.DocumentException;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
@@ -38,6 +43,7 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		userManager = null;
 		provider = null;
 	}
+
 	/**
 	 * Convenience method that returns true if this UserProvider is read-only.
 	 *
@@ -79,6 +85,46 @@ public class TTTalkUserBatchPlugin implements Plugin {
 					invalidUsers.add(userName);
 				}
 			}
+		}
+		log.info("createUsers create: " + create + ", error:" + error);
+
+		return invalidUsers;
+	}
+
+	public List<String> importUserData(FileItem file) throws DocumentException,
+			IOException {
+		List<String> invalidUsers = new ArrayList<String>();
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+				file.getInputStream()));
+		String line = null;
+		int create = 0;
+		int error = 0;
+		while ((line = in.readLine()) != null) {
+			log.info("readLine: " + line);
+			String[] temp = line.split(",");
+			String userName = temp[0].trim();
+			String password = temp[1].trim();
+
+			if ((userName != null) && (password != null)) {
+				try {
+					userName = Stringprep.nodeprep(userName);
+
+					if (!isUserProviderReadOnly()) {
+						userManager.createUser(userName, password, null, null);
+						log.info("createUser: " + userName + "," + password);
+					}
+
+					// Check to see user exists before adding their roster, this
+					// is for read-only user providers.
+					userManager.getUser(userName);
+					create++;
+				} catch (Exception e) {
+					error++;
+					log.error(e.getMessage());
+					invalidUsers.add(userName);
+				}
+			}
+
 		}
 		log.info("createUsers create: " + create + ", error:" + error);
 
