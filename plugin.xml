@@ -11,7 +11,7 @@
 	<minServerVersion>3.9.0</minServerVersion>
 
 	<adminconsole>
-		<tab id="tab-plugins">
+		<tab id="tab-users">
 			<sidebar id="tttalk" name="TTTalk">
 				<item id="tttalk-create" name="TTTalk User Create" url="create-users.jsp"
 					description="Create Openfire user batchly." />

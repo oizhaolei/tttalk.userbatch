@@ -102,29 +102,31 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		while ((line = in.readLine()) != null) {
 			log.info("readLine: " + line);
 			String[] temp = line.split(",");
+			if (temp.length != 2)
+				continue;
 			String userName = temp[0].trim();
 			String password = temp[1].trim();
+			if ((userName == null) || (password == null))
+				continue;
 
-			if ((userName != null) && (password != null)) {
-				try {
-					userName = Stringprep.nodeprep(userName);
 
-					if (!isUserProviderReadOnly()) {
-						userManager.createUser(userName, password, null, null);
-						log.info("createUser: " + userName + "," + password);
-					}
+			try {
+				userName = Stringprep.nodeprep(userName);
 
-					// Check to see user exists before adding their roster, this
-					// is for read-only user providers.
-					userManager.getUser(userName);
-					create++;
-				} catch (Exception e) {
-					error++;
-					log.error(e.getMessage());
-					invalidUsers.add(userName);
+				if (!isUserProviderReadOnly()) {
+					userManager.createUser(userName, password, null, null);
+					log.info("createUser: " + userName + "," + password);
 				}
-			}
 
+				// Check to see user exists before adding their roster, this
+				// is for read-only user providers.
+				userManager.getUser(userName);
+				create++;
+			} catch (Exception e) {
+				error++;
+				log.error(e.getMessage());
+				invalidUsers.add(userName);
+			}
 		}
 		log.info("createUsers create: " + create + ", error:" + error);
 
