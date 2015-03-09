@@ -1,10 +1,15 @@
 <%@ page import="java.net.MalformedURLException,
                  java.util.*,
+<<<<<<< HEAD
                  org.apache.commons.fileupload.DiskFileUpload,
                  org.apache.commons.fileupload.FileItem,
                  org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,
                  org.jivesoftware.openfire.XMPPServer,
                  org.jivesoftware.util.ParamUtils"
+=======
+                 org.dom4j.DocumentException,
+                 org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,org.jivesoftware.openfire.XMPPServer,org.jivesoftware.util.ParamUtils"
+>>>>>>> 91d5adb676ceb22bc028956c4f1a40d071e08d5c
 %>
 
 <%
@@ -71,12 +76,7 @@
             <% if (errors.containsKey("emptyData")) { %>
                Please input username and password list.<br>
             <% }else if (errors.containsKey("invalidUser")) { %>
-                
-                <% if (plugin.isUserProviderReadOnly()) { %>
-                   The following users did not exist in the system or have invalid username so their roster was not loaded:<br>
-                <% } else { %>
-                   The following users already exist in the system or have invalid username and were not loaded:<br>
-                <% } %>
+               The following users already exist in the system or have invalid username:<br>
             <%
                 Iterator iter = duplicateUsers.iterator();
                 while (iter.hasNext()) {
@@ -103,11 +103,7 @@
         <tbody>
         <tr>
             <td class="jive-icon"><img src="images/success-16x16.gif" width="16" height="16" border="0"></td>
-            <% if (plugin.isUserProviderReadOnly()) { %>
-               <td class="jive-icon-label">User roster data added successfully.</td>
-            <% } else { %>
-               <td class="jive-icon-label">All users added successfully.</td>
-            <% } %>
+            <td class="jive-icon-label">All users added successfully.</td>
         </tr>
         </tbody>
     </table>
