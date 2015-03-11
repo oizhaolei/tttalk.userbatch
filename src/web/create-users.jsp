@@ -1,15 +1,10 @@
 <%@ page import="java.net.MalformedURLException,
                  java.util.*,
-<<<<<<< HEAD
                  org.apache.commons.fileupload.DiskFileUpload,
                  org.apache.commons.fileupload.FileItem,
                  org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,
                  org.jivesoftware.openfire.XMPPServer,
                  org.jivesoftware.util.ParamUtils"
-=======
-                 org.dom4j.DocumentException,
-                 org.tttalk.openfire.plugin.TTTalkUserBatchPlugin,org.jivesoftware.openfire.XMPPServer,org.jivesoftware.util.ParamUtils"
->>>>>>> 91d5adb676ceb22bc028956c4f1a40d071e08d5c
 %>
 
 <%
