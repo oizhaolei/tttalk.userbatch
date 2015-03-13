@@ -14,11 +14,18 @@ import org.dom4j.DocumentException;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.openfire.group.Group;
+import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserProvider;
+import org.jivesoftware.util.WebManager;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
 public class TTTalkUserBatchPlugin implements Plugin {
 
@@ -26,12 +33,18 @@ public class TTTalkUserBatchPlugin implements Plugin {
 			.getLogger(TTTalkUserBatchPlugin.class);
 
 	private UserManager userManager;
+	private GroupManager groupManager;
 	private UserProvider provider;
+
+	private String domain;
 
 	public TTTalkUserBatchPlugin() {
 		userManager = XMPPServer.getInstance().getUserManager();
+		WebManager wm = new WebManager();
+		wm.getGroupManager();
+		groupManager = GroupManager.getInstance();
 		provider = UserManager.getUserProvider();
-		XMPPServer.getInstance().getServerInfo().getXMPPDomain();
+		domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
 	}
 
 	@Override
@@ -109,7 +122,6 @@ public class TTTalkUserBatchPlugin implements Plugin {
 			if ((userName == null) || (password == null))
 				continue;
 
-
 			try {
 				userName = Stringprep.nodeprep(userName);
 
@@ -156,4 +168,92 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		}
 		log.info("deleteUsers deleted: " + delete + ", error:" + error);
 	}
+
+	public List<String> createGroups(String groupData) {
+		List<String> invalidGroups = new ArrayList<String>();
+
+		String[] lines = groupData.split("\n");
+
+		int create = 0;
+		int error = 0;
+
+		for (int i = 0; i < lines.length; i++) {
+			String line = lines[i];
+			String groupName = line.trim();
+
+			if ((groupName != null)) {
+				try {
+					groupName = Stringprep.nodeprep(groupName);
+
+					// Check to see user exists before adding their roster, this
+					// is for read-only user providers.
+					groupManager.createGroup(groupName);
+					create++;
+				} catch (Exception e) {
+					error++;
+					log.error(e.getMessage());
+					invalidGroups.add(groupName);
+				}
+			}
+		}
+		log.info("createUsers create: " + create + ", error:" + error);
+
+		return invalidGroups;
+	}
+
+	public List<String> importGroupData(FileItem file)
+			throws DocumentException, IOException {
+		// TODO
+		return null;
+	}
+
+	public void manageGroupMemebers(String str) throws JSONException {
+		JSONArray ja = new JSONArray(str);
+		for (int i = 0; i < ja.length(); i++) {
+			JSONObject gjo = ja.getJSONObject(i);
+			String groupname = gjo.getString("group");
+			JSONArray mja = gjo.getJSONArray("members");
+			List<String> members = new ArrayList<>();
+			for (int j = 0; j < mja.length(); j++) {
+				String username = mja.getString(j);
+				members.add(username);
+			}
+			// groupname & members
+			try {
+				Group group = groupManager.getGroup(groupname);
+				group.getMembers().clear();
+				for (String username : members) {
+					group.getMembers().add(
+							new JID(username + '@' + domain + '/' + "tttalk"));
+				}
+			} catch (Exception e) {
+				log.error(e.getMessage());
+			}
+		}
+	}
+
+	public void deleteGroups(String str) {
+		String[] groupnames = str.split("\n");
+
+		// RosterManager rosterManager = server.getRosterManager();
+		log.info("Deleting groups accounts: " + groupnames.length);
+		int delete = 0;
+		int error = 0;
+		for (String groupname : groupnames) {
+			try {
+				groupname = groupname.trim();
+				Group group = groupManager.getGroup(groupname);
+
+				// deleteRosters(group, rosterManager);
+				groupManager.deleteGroup(group);
+				log.info("deleteGroup: " + groupname);
+				delete++;
+			} catch (Exception e) {
+				error++;
+				log.error(e.getMessage());
+			}
+		}
+		log.info("deleteGroups deleted: " + delete + ", error:" + error);
+	}
+
 }

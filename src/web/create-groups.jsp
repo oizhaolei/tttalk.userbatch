@@ -8,54 +8,54 @@
 %>
 
 <%
-	boolean createUsers = request.getParameter("createUsers") != null;
-	boolean importUsers = request.getParameter("importUsers") != null;
+	boolean createGroups = request.getParameter("createGroups") != null;
+	boolean importGroups = request.getParameter("importGroups") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
-    List<String> invalidUsers = new ArrayList<String>();
+    List<String> invalidGroups = new ArrayList<String>();
    
     Map<String, String> errors = new HashMap<String, String>();
-    if (createUsers) {
+    if (createGroups) {
     	String data = request.getParameter("data");
     	if (data.trim().length() == 0){
     		errors.put("emptyData", "emptyData");
     	}else{
-        	invalidUsers.addAll(plugin.createUsers(data));
+        	invalidGroups.addAll(plugin.createGroups(data));
         	
-        	if (invalidUsers.size() == 0) {
-                response.sendRedirect("create-users.jsp?success=true");
+        	if (invalidGroups.size() == 0) {
+                response.sendRedirect("create-groups.jsp?success=true");
                 return;
             }
             
-            errors.put("invalidUser", "invalidUser");
+            errors.put("invalidGroup", "invalidGroup");
     	}        
-	} else if (importUsers) {
+	} else if (importGroups) {
         DiskFileUpload dfu = new DiskFileUpload();
       
         List fileItems = dfu.parseRequest(request);
         Iterator i = fileItems.iterator();
         FileItem fi = (FileItem) i.next();
-        plugin.importUserData(fi);
-        response.sendRedirect("create-users.jsp?success=true");
+        plugin.importGroupData(fi);
+        response.sendRedirect("create-groups.jsp?success=true");
 	}
 %>
 
 <html>
     <head>
-        <title>Create TTTalk User Data</title>
+        <title>Create TTTalk Group Data</title>
         <meta name="pageID" content="tttalk-create"/>
     </head>
     <style>
 	    ::-webkit-input-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
+		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
 		}
 		
 		::-moz-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
+		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
 		}
 		
 		:-ms-input-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
+		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
 		}
     </style>
     <body>
@@ -69,14 +69,14 @@
             <td class="jive-icon"><img src="images/error-16x16.gif" width="16" height="16" border="0"></td>
             <td class="jive-icon-label">
             <% if (errors.containsKey("emptyData")) { %>
-               Please input username and password list.<br>
-            <% }else if (errors.containsKey("invalidUser")) { %>
-               The following users already exist in the system or have invalid username:<br>
+               Please input groupname list.<br>
+            <% }else if (errors.containsKey("invalidGroup")) { %>
+               The following groups already exist in the system or have invalid groupname:<br>
             <%
-                Iterator iter = invalidUsers.iterator();
+                Iterator iter = invalidGroups.iterator();
                 while (iter.hasNext()) {
-                    String username = (String) iter.next();
-                    %><%= username %><%
+                    String groupname = (String) iter.next();
+                    %><%= groupname %><%
                     if (iter.hasNext()) {
                         %>,&nbsp;<%
                     } else {
@@ -98,7 +98,7 @@
         <tbody>
         <tr>
             <td class="jive-icon"><img src="images/success-16x16.gif" width="16" height="16" border="0"></td>
-            <td class="jive-icon-label">All users added successfully.</td>
+            <td class="jive-icon-label">All groups added successfully.</td>
         </tr>
         </tbody>
     </table>
@@ -107,7 +107,7 @@
 
 <% } %>
 
-<form action="create-users.jsp?createUsers=true" method="post" >
+<form action="create-groups.jsp?createGroups=true" method="post" >
 
 <div class="jive-contentBoxHeader">Create</div>
 <div class="jive-contentBox">
@@ -117,9 +117,7 @@
 
 </form>
 
-
-
-<form action="create-users.jsp?importUsers=true" method="post" enctype="multipart/form-data">
+<form action="create-groups.jsp?importGroups=true" method="post" enctype="multipart/form-data">
 	<div class="jive-contentBoxHeader">Import</div>
 	<div class="jive-contentBox">
 	    Choose a file to import:</p>

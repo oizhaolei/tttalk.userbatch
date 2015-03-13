@@ -6,18 +6,39 @@ $ cd $OPENFIRE_HOME/build
 
 $ ant plugin -Dplugin=tttalk.userbatch
 
-1. Create Data format:
+1. Create Users format:
 
 username_1,password_1
 username_2,password_2
 username_3,password_3
 ...
 
-2. Delete Data format:
+2. Delete Users format:
 
 username_1
 username_2
 username_3
 ...
 
+3. Create Groups format:
 
+groupname_1
+groupname_2
+groupname_3
+...
+
+4. Delete Groups format:
+
+groupname_1
+groupname_2
+groupname_3
+...
+
+
+4. Manager Groups Members format(JSON format):
+
+[
+	{"group" : "aa", "members" : ["chinatalk_10000", "chinatalk_10001"]},
+	{"group" : "bb", "members" : ["chinatalk_10000", "chinatalk_10001"]},
+	{"group" : "cc", "members" : ["chinatalk_10000", "chinatalk_10001"]}
+]

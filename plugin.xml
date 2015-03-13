@@ -20,6 +20,18 @@
 				<item id="tttalk-delete" name="TTTalk User Delete" url="delete-users.jsp"
 					description="Delete Openfire user batchly." />
 			</sidebar>
+			<sidebar id="tttalk" name="TTTalk">
+				<item id="tttalk-group-create" name="TTTalk Group Create" url="create-groups.jsp"
+					description="Create Openfire group batchly." />
+			</sidebar>
+			<sidebar id="tttalk" name="TTTalk">
+				<item id="tttalk-group-delete" name="TTTalk Group Delete" url="delete-groups.jsp"
+					description="Delete Openfire group batchly." />
+			</sidebar>
+			<sidebar id="tttalk" name="TTTalk">
+				<item id="tttalk-group-members" name="TTTalk Group Members" url="manage-group-members.jsp"
+					description="Manage Openfire group members." />
+			</sidebar>
 		</tab>
 	</adminconsole>
 </plugin>
