@@ -10,6 +10,7 @@
 <%
 	boolean createUsers = request.getParameter("createUsers") != null;
 	boolean importUsers = request.getParameter("importUsers") != null;
+	boolean createUserSql = request.getParameter("createUserSql") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
     List<String> invalidUsers = new ArrayList<String>();
@@ -37,6 +38,20 @@
         FileItem fi = (FileItem) i.next();
         plugin.importUserData(fi);
         response.sendRedirect("create-users.jsp?success=true");
+	} else if (createUserSql) {
+    	String sql = request.getParameter("sql");
+    	if (sql.trim().length() == 0){
+    		errors.put("emptyData", "emptyData");
+    	}else{
+        	invalidUsers.addAll(plugin.createUserSql(sql));
+        	
+        	if (invalidUsers.size() == 0) {
+                response.sendRedirect("create-users.jsp?success=true");
+                return;
+            }
+            
+            errors.put("invalidUser", "invalidUser");
+    	}
 	}
 %>
 
@@ -45,19 +60,6 @@
         <title>Create TTTalk User Data</title>
         <meta name="pageID" content="tttalk-create"/>
     </head>
-    <style>
-	    ::-webkit-input-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
-		}
-		
-		::-moz-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
-		}
-		
-		:-ms-input-placeholder::before {
-		  content: "username_1,password_1\000Ausername_2,password_2\000Ausername_3,password_3";
-		}
-    </style>
     <body>
 
 <% if (errors.size() > 0) { %>
@@ -128,6 +130,17 @@
 	<input type="submit" value="Import">
 
 </form>
+
+<form action="create-users.jsp?createUserSql=true" method="post" >
+
+<div class="jive-contentBoxHeader">Create SQL</div>
+<div class="jive-contentBox">
+    <textarea name="sql" rows="10" style="width:50%" placeholder=" "></textarea>
+</div>
+<input type="submit" value="Create">
+
+</form>
+
 
 </body>
 </html>

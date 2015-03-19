@@ -10,6 +10,7 @@
 <%
 	boolean createGroups = request.getParameter("createGroups") != null;
 	boolean importGroups = request.getParameter("importGroups") != null;
+	boolean createGroupSql = request.getParameter("createGroupSql") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
     List<String> invalidGroups = new ArrayList<String>();
@@ -37,6 +38,20 @@
         FileItem fi = (FileItem) i.next();
         plugin.importGroupData(fi);
         response.sendRedirect("create-groups.jsp?success=true");
+	} else if (createGroupSql) {
+    	String sql = request.getParameter("sql");
+    	if (sql.trim().length() == 0){
+    		errors.put("emptyData", "emptyData");
+    	}else{
+        	invalidGroups.addAll(plugin.createGroupSql(sql));
+        	
+        	if (invalidGroups.size() == 0) {
+                response.sendRedirect("create-groups.jsp?success=true");
+                return;
+            }
+            
+            errors.put("invalidGroup", "invalidGroup");
+    	}        
 	}
 %>
 
@@ -45,19 +60,6 @@
         <title>Create TTTalk Group Data</title>
         <meta name="pageID" content="tttalk-create"/>
     </head>
-    <style>
-	    ::-webkit-input-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-		
-		::-moz-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-		
-		:-ms-input-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-    </style>
     <body>
 
 <% if (errors.size() > 0) { %>
@@ -124,6 +126,16 @@
 	    <input type="file" name="thefile">
 	</div>
 	<input type="submit" value="Import">
+
+</form>
+
+<form action="create-groups.jsp?createGroupSql=true" method="post" >
+
+<div class="jive-contentBoxHeader">Create Sql</div>
+<div class="jive-contentBox">
+    <textarea name="sql" rows="10" style="width:50%" placeholder=" "></textarea>
+</div>
+<input type="submit" value="Create">
 
 </form>
 

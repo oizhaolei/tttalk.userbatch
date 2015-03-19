@@ -6,16 +6,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.dom4j.DocumentException;
+import org.jivesoftware.database.DbConnectionManager;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupManager;
+import org.jivesoftware.openfire.group.GroupNotFoundException;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserProvider;
@@ -40,6 +44,7 @@ public class TTTalkUserBatchPlugin implements Plugin {
 
 	public TTTalkUserBatchPlugin() {
 		userManager = XMPPServer.getInstance().getUserManager();
+
 		WebManager wm = new WebManager();
 		wm.getGroupManager();
 		groupManager = GroupManager.getInstance();
@@ -78,7 +83,6 @@ public class TTTalkUserBatchPlugin implements Plugin {
 			String[] temp = lines[i].split(",");
 			String userName = temp[0].trim();
 			String password = temp[1].trim();
-
 			if ((userName != null) && (password != null)) {
 				try {
 					userName = Stringprep.nodeprep(userName);
@@ -101,6 +105,43 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		}
 		log.info("createUsers create: " + create + ", error:" + error);
 
+		return invalidUsers;
+	}
+
+	public List<String> createUserSql(String sql) throws Exception {
+		List<String> invalidUsers = new ArrayList<String>();
+		try {
+			Statement cs = DbConnectionManager.getConnection()
+					.createStatement();
+			ResultSet rs = cs.executeQuery(sql);
+			while (rs.next()) {
+				String username = rs.getString("username");
+				String password = rs.getString("password");
+				String name = rs.getString("name");
+
+				if ((username != null) && (password != null)) {
+					try {
+						username = Stringprep.nodeprep(username);
+
+						if (!isUserProviderReadOnly()) {
+							userManager.createUser(username, password, name,
+									null);
+							log.info("createUser: " + username + "," + password
+									+ "," + name);
+						}
+
+						// Check to see user exists before adding their roster,
+						// this
+						// is for read-only user providers.
+						userManager.getUser(username);
+					} catch (Exception e) {
+						log.error(e.getMessage());
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
 		return invalidUsers;
 	}
 
@@ -201,6 +242,37 @@ public class TTTalkUserBatchPlugin implements Plugin {
 		return invalidGroups;
 	}
 
+	public List<String> createGroupSql(String sql) throws Exception {
+		List<String> invalidGroups = new ArrayList<String>();
+		try {
+			Statement cs = DbConnectionManager.getConnection()
+					.createStatement();
+			ResultSet rs = cs.executeQuery(sql);
+			while (rs.next()) {
+				String name = rs.getString("name");
+				String desc = rs.getString("description");
+				log.info("createGroupSql: " + name + "," + desc);
+
+				try {
+					name = Stringprep.nodeprep(name);
+
+					Group group;
+					try {
+						group = groupManager.getGroup(name);
+					} catch (GroupNotFoundException e) {
+						group = groupManager.createGroup(name);
+					}
+					group.setDescription(desc);
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+		return invalidGroups;
+	}
+
 	public List<String> importGroupData(FileItem file)
 			throws DocumentException, IOException {
 		// TODO
@@ -229,6 +301,44 @@ public class TTTalkUserBatchPlugin implements Plugin {
 			} catch (Exception e) {
 				log.error(e.getMessage());
 			}
+		}
+	}
+
+	public void manageGroupMemeberSql(String sql) {
+		try {
+
+			Statement cs = DbConnectionManager.getConnection()
+					.createStatement();
+			ResultSet rs = cs.executeQuery(sql);
+			List<String> members = new ArrayList<>();
+			String oldgroupname = null, groupname = null;
+			while (rs.next()) {
+				groupname = rs.getString("groupname");
+				String membername = rs.getString("membername");
+
+				if (oldgroupname != null && !oldgroupname.equals(groupname)) {
+					setGroupMembers(members, oldgroupname);
+					members.clear();
+				}
+				members.add(membername);
+				oldgroupname = groupname;
+			}
+			setGroupMembers(members, groupname);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+		}
+	}
+
+	private void setGroupMembers(List<String> members, String groupname) {
+		// groupname & members
+		try {
+			Group group = groupManager.getGroup(groupname);
+			group.getMembers().clear();
+			for (String username : members) {
+				group.getMembers().add(new JID(username + '@' + domain));
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage());
 		}
 	}
 

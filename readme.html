@@ -1,31 +1,25 @@
 An openfire plugin.
 
-Batchly create/delete accounts using username and password list.
+Batchly create/delete accounts using name and password list.
 
 $ cd $OPENFIRE_HOME/build
 
 $ ant plugin -Dplugin=tttalk.userbatch
 
-1. Create Users format:
-
-username_1,password_1
-username_2,password_2
-username_3,password_3
-...
+1. Create Users sql:
+SELECT 'student_'||xh as username, substr(xh, -4, 4) as password, xm as name FROM VI_YKT_XSXX
+SELECT 'teacher_'||GH as username, substr(GH, -4, 4) as password, xm as name FROM RS_HR_TEACHER_JZGJCXX
 
 2. Delete Users format:
 
-username_1
-username_2
-username_3
+name_1
+name_2
+name_3
 ...
 
 3. Create Groups format:
 
-groupname_1
-groupname_2
-groupname_3
-...
+select 'org_'||CODE as name, DEPARTNAME as description from RS_OU_DEPARTMENT 
 
 4. Delete Groups format:
 
@@ -42,3 +36,6 @@ groupname_3
 	{"group" : "bb", "members" : ["chinatalk_10000", "chinatalk_10001"]},
 	{"group" : "cc", "members" : ["chinatalk_10000", "chinatalk_10001"]}
 ]
+
+
+SELECT 'org_'||dept.CODE as groupname, 'teacher_'||t.GH as membername FROM RS_OU_DEPARTMENT dept, RS_HR_TEACHER_JZGJCXX t  where t.dwm = dept.code order by dept.CODE

@@ -9,6 +9,7 @@
 
 <%
 	boolean manageGroupMemebers = request.getParameter("manageGroupMemebers") != null;
+	boolean manageGroupMemeberSql = request.getParameter("manageGroupMemeberSql") != null;
    
     TTTalkUserBatchPlugin plugin = (TTTalkUserBatchPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("tttalk.userbatch");
    
@@ -20,6 +21,13 @@
     	}else{
 			plugin.manageGroupMemebers(data);
     	}        
+	} else if (manageGroupMemeberSql) {
+    	String sql = request.getParameter("sql");
+    	if (sql.trim().length() == 0){
+    		errors.put("emptyData", "emptyData");
+    	}else{
+			plugin.manageGroupMemeberSql(sql);
+    	}        
 	}
 %>
 
@@ -28,19 +36,6 @@
         <title>Manage TTTalk Group Members</title>
         <meta name="pageID" content="tttalk-group-members"/>
     </head>
-    <style>
-	    ::-webkit-input-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-		
-		::-moz-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-		
-		:-ms-input-placeholder::before {
-		  content: "groupname_1\000Agroupname_2\000Agroupname_3";
-		}
-    </style>
     <body>
 
 <% if (errors.size() > 0) { %>
@@ -82,6 +77,16 @@
 <div class="jive-contentBoxHeader">Group Members</div>
 <div class="jive-contentBox">
     <textarea name="data" rows="10" style="width:50%" placeholder=" "></textarea>
+</div>
+<input type="submit" value="Create">
+
+</form>
+
+<form action="manage-group-members.jsp?manageGroupMemeberSql=true" method="post" >
+
+<div class="jive-contentBoxHeader">Group Members SQL</div>
+<div class="jive-contentBox">
+    <textarea name="sql" rows="10" style="width:50%" placeholder=" "></textarea>
 </div>
 <input type="submit" value="Create">
 
